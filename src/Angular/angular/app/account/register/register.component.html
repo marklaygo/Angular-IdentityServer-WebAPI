@@ -1,0 +1,67 @@
+﻿<div [hidden]="!loading" style="margin-top: -5px;">
+    <md-progress-bar mode="indeterminate" color="accent"></md-progress-bar>
+</div>
+
+<div class="card-container">
+    <form [formGroup]="registerForm" (ngSubmit)="registerForm.valid && onSubmit()" novalidate> 
+        <md-card>
+            <md-toolbar color="primary">
+                <span>{{ toolbarTitle }}</span>
+            </md-toolbar>
+
+            <!-- alert -->
+            <div *ngIf="actionError" style="display: flex; justify-content: center;"
+                 [ngClass]="{'failed-color': alertStatus, 'success-color': !alertStatus}">
+                    {{ actionErrorMsg }}
+            </div><br />
+
+            <md-card-content>
+                <!-- email -->
+                <md-input-container class="max-width">
+                    <input mdInput
+                           id="email"
+                           formControlName="email"
+                           placeholder="email"
+                           autofocus
+                           required>
+                </md-input-container>
+                <div *ngIf="formErrors.email" [ngStyle]="{'color': 'red'}" [innerHTML]="formErrors.email" class="form-val-hint"></div>
+                <div class="h-space"></div>
+
+                <!-- password -->
+                <md-input-container class="max-width">
+                    <input mdInput
+                           type="password"
+                           id="password"
+                           formControlName="password"
+                           placeholder="password"
+                           required>
+                </md-input-container>
+                <div *ngIf="formErrors.password"
+                     [ngStyle]="{'color': 'red'}"
+                     [innerHTML]="formErrors.password"
+                     class="form-val-hint">
+                </div>
+                <div class="h-space"></div>
+
+                <!-- confirm password -->
+                <md-input-container class="max-width">
+                    <input mdInput
+                           type="password"
+                           id="confirmPassword" 
+                           formControlName="confirmPassword"
+                           placeholder="repeat password"
+                           required>
+                </md-input-container>
+                <div *ngIf="formErrors.confirmPassword"
+                     [ngStyle]="{'color': 'red'}"
+                     [innerHTML]="formErrors.confirmPassword"
+                     class="form-val-hint">
+                </div>
+                <div class="h-space"></div>
+
+                <button md-raised-button color="accent" class="max-width" [disabled]="loading">Register</button>
+            </md-card-content>
+        </md-card>
+    </form>
+</div>

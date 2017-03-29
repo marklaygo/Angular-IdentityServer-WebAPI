@@ -1,0 +1,24 @@
+﻿<div [hidden]="!loading" style="margin-top: -5px;">
+    <md-progress-bar mode="indeterminate" color="accent"></md-progress-bar>
+</div>
+
+<div class="container">
+    <h2>Api Component</h2>
+
+    <br /><br />
+    <button md-raised-button color="accent" (click)="add()">Add random number</button>
+    <br /><br />
+
+    <div *ngFor="let number of numbers">
+        <md-card class="values-card">
+            <md-card-content>
+                <div class="value-card-content">
+                    <h3>Id: {{number.id}} | Value: {{ number.value }}</h3>
+                    <span class="space-filler"></span>
+                    <button md-raised-button color="warn" (click)="delete(number.id)">Delete</button>
+                </div>
+            </md-card-content>
+        </md-card>
+        <br />
+    </div>
+</div>

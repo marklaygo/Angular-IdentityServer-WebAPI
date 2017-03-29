@@ -1,0 +1,24 @@
+﻿.card-container {
+    padding-top: 50px;
+    display: flex;
+    justify-content: center;
+}
+
+md-card {
+    width: 350px;
+}
+
+md-toolbar {
+    margin-bottom: 40px;
+}
+
+md-card-actions {
+    display: flex;
+    justify-content: center;
+}
+
+a, a:hover, a:visited {
+    color: #2196f3;
+    cursor: pointer;
+    text-decoration: none;
+}
