@@ -25,7 +25,7 @@
                            autofocus
                            required>
                 </md-input-container>
-                <div *ngIf="formErrors.email" [ngStyle]="{'color': 'red'}" [innerHTML]="formErrors.email" class="form-val-hint"></div>
+                <md-error *ngIf="formErrors.email" [innerHTML]="formErrors.email" class="form-val-hint"></md-error>
                 <div class="h-space"></div>
 
                 <!-- password -->
@@ -37,11 +37,10 @@
                            placeholder="password"
                            required>
                 </md-input-container>
-                <div *ngIf="formErrors.password"
-                     [ngStyle]="{'color': 'red'}"
+                <md-error *ngIf="formErrors.password"
                      [innerHTML]="formErrors.password"
                      class="form-val-hint">
-                </div>
+                </md-error>
                 <div class="h-space"></div>
 
                 <!-- confirm password -->
@@ -53,11 +52,10 @@
                            placeholder="repeat password"
                            required>
                 </md-input-container>
-                <div *ngIf="formErrors.confirmPassword"
-                     [ngStyle]="{'color': 'red'}"
+                <md-error *ngIf="formErrors.confirmPassword"
                      [innerHTML]="formErrors.confirmPassword"
                      class="form-val-hint">
-                </div>
+                </md-error>
                 <div class="h-space"></div>
 
                 <button md-raised-button color="accent" class="max-width" [disabled]="loading">Register</button>

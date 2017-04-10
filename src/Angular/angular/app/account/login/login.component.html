@@ -24,11 +24,10 @@
                            autofocus
                            required>
                 </md-input-container>
-                <div *ngIf="formErrors.email"
-                     [ngStyle]="{'color': 'red'}"
+                <md-error *ngIf="formErrors.email"
                      [innerHTML]="formErrors.email"
                      class="form-val-hint">
-                </div>
+                </md-error>
                 <div class="h-space"></div>
 
                 <!-- password -->
@@ -40,10 +39,9 @@
                            placeholder="password"
                            required>
                 </md-input-container>
-                <div *ngIf="formErrors.password"
-                     [ngStyle]="{'color': 'red'}"
+                <md-error *ngIf="formErrors.password"
                      [innerHTML]="formErrors.password"
-                     class="form-val-hint"></div>
+                     class="form-val-hint"></md-error>
                 <div class="h-space"></div>
 
                 <button type="submit" md-raised-button color="accent" class="max-width" [disabled]="loading">Login</button>
