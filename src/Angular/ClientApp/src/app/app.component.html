@@ -1,0 +1,38 @@
+<div class="app-nav">
+  <mat-toolbar color="primary">
+    <a mat-button routerLink="/home">
+      <img class="angular-logo" src="../assets/images/angular-white-transparent.svg">
+      {{ title }}
+    </a>
+    <a mat-button routerLink="/home">Home</a>
+    <a mat-button routerLink="/api">Web API</a>
+
+    <span class="toolbar-spacer"></span>
+
+    <div *ngIf="(isAuthenticated | async); else login">
+      <button mat-mini-fab color="accent" [matMenuTriggerFor]="menu"><mat-icon>menu</mat-icon></button>
+    </div>
+    <ng-template #login>
+      <div>
+        <button mat-raised-button color="accent" routerLink="/login">Login</button>
+        <button mat-raised-button color="primary" routerLink="/register">Register</button>
+      </div>
+    </ng-template>
+  </mat-toolbar>
+</div>
+
+<!-- menu -->
+<mat-menu #menu="matMenu">
+  <button mat-menu-item routerLink="/accountsettings">
+    <mat-icon>fingerprint</mat-icon>
+    <span>Account Settings</span>
+  </button>
+  <button mat-menu-item (click)="signOut()">
+    <mat-icon>power_settings_new</mat-icon>
+    <span>Logout</span>
+  </button>
+</mat-menu>
+
+<div class="app-container">
+  <router-outlet></router-outlet>
+</div>

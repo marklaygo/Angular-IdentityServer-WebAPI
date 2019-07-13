@@ -1,35 +1,46 @@
 ﻿using IdentityServer4;
 using IdentityServer4.Models;
-using System;
+using IdentityServer4.Test;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace IdentityServer
 {
-    public class Config
+    public static class Config
     {
-        public static IEnumerable<IdentityResource> GetIdentityResources()
+        public static List<TestUser> GetUsers()
         {
-            return new List<IdentityResource>
+            return new List<TestUser>
             {
-                new IdentityResources.OpenId(),
-                new IdentityResources.Profile(),
+                new TestUser
+                {
+                    SubjectId = "1",
+                    Username = "alice@alice.com",
+                    Password = "password"
+                }
             };
         }
 
-        public static IEnumerable<ApiResource> GetApiResources()
+        public static IEnumerable<IdentityResource> GetIdentityResources()
         {
-            return new List<ApiResource>
+            return new IdentityResource[]
             {
-                new ApiResource("api1", "WebApi"),
+                new IdentityResources.OpenId(),
+                new IdentityResources.Profile()
+            };
+        }
+
+        public static IEnumerable<ApiResource> GetApis()
+        {
+            return new ApiResource[]
+            {
+                new ApiResource("api1", "webApi"),
                 new ApiResource("accountApi", "AccountApi")
             };
         }
 
-        public static List<Client> GetClients()
+        public static IEnumerable<Client> GetClients()
         {
-            return new List<Client>
+            return new Client[]
             {
                 new Client
                 {
@@ -49,6 +60,5 @@ namespace IdentityServer
                 }
             };
         }
-
     }
 }

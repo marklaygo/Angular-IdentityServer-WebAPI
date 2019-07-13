@@ -1,0 +1,13 @@
+mat-card {
+  width: 350px;
+}
+
+.card-container {
+  padding-top: 50px;
+  display: flex;
+  justify-content: center;
+}
+
+mat-toolbar {
+  margin-bottom: 40px;
+}

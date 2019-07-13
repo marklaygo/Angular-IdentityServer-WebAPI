@@ -4,78 +4,65 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Rewrite;
+using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
 using WebAPI.Data;
 
 namespace WebAPI
 {
     public class Startup
     {
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
+        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            // add cors
+            services.AddMvcCore()
+                .AddAuthorization()
+                .AddJsonFormatters();
+
+            services.AddAuthentication("Bearer")
+                .AddJwtBearer("Bearer", options =>
+                {
+                    options.Authority = "http://localhost:5000";
+                    options.RequireHttpsMetadata = false;
+                    options.Audience = "api1";
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ClockSkew = TimeSpan.FromMinutes(0)
+                    };
+                });
+
             services.AddCors(options =>
             {
-                options.AddPolicy("devCors",
-                    builder => builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials());
-
-                options.AddPolicy("prodCors",
-                    builder => builder.WithOrigins("https://angular-d1.azurewebsites.net")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials());
+                options.AddPolicy("default", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
             });
-
-            services.AddMvc();
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            loggerFactory.AddConsole(Configuration.GetSection("Logging"));
-            loggerFactory.AddDebug();
-
             if (env.IsDevelopment())
             {
-                app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
-                {
-                    Authority = "http://localhost:5000",
-                    RequireHttpsMetadata = false,
-                    ApiName = "api1"
-                });
-                app.UseCors("devCors");
-            }
-            else
-            {
-                var options = new RewriteOptions().AddRedirectToHttps(302); // redirect to https
-                app.UseRewriter(options);
-
-                app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
-                {
-                    Authority = "https://identityserver-d1.azurewebsites.net",
-                    RequireHttpsMetadata = false,
-                    ApiName = "api1"
-                });
-                app.UseCors("prodCors");
+                app.UseDeveloperExceptionPage();
             }
 
+            app.UseCors("default");
+            app.UseAuthentication();
             app.UseMvc();
 
             NumberService.Initialize();

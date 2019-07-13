@@ -1,0 +1,65 @@
+<div [hidden]="!loading" style="margin-top: -5px;">
+  <mat-progress-bar mode="indeterminate" color="accent"></mat-progress-bar>
+</div>
+
+<div class="card-container">
+  <form [formGroup]="registerForm" (ngSubmit)="registerForm.valid && onSubmit()" novalidate>
+    <mat-card>
+      <mat-toolbar color="primary">
+        <span>{{ toolbarTitle }}</span>
+      </mat-toolbar>
+
+      <!-- alert -->
+      <div *ngIf="actionError" style="display: flex; justify-content: center;"
+           [ngClass]="{'failed-color': alertStatus, 'success-color': !alertStatus}">
+        {{ actionErrorMsg }}
+      </div><br />
+
+      <mat-card-content>
+        <!-- email -->
+        <mat-form-field class="max-width">
+          <input matInput
+                 id="email"
+                 formControlName="email"
+                 placeholder="email"
+                 autofocus
+                 required>
+        </mat-form-field>
+        <mat-error *ngIf="formErrors.email" [innerHTML]="formErrors.email" class="form-val-hint"></mat-error>
+        <div class="h-space"></div>
+
+        <!-- password -->
+        <mat-form-field class="max-width">
+          <input matInput
+                 type="password"
+                 id="password"
+                 formControlName="password"
+                 placeholder="password"
+                 required>
+        </mat-form-field>
+        <mat-error *ngIf="formErrors.password"
+                  [innerHTML]="formErrors.password"
+                  class="form-val-hint">
+        </mat-error>
+        <div class="h-space"></div>
+
+        <!-- confirm password -->
+        <mat-form-field class="max-width">
+          <input matInput
+                 type="password"
+                 id="confirmPassword"
+                 formControlName="confirmPassword"
+                 placeholder="repeat password"
+                 required>
+        </mat-form-field>
+        <mat-error *ngIf="formErrors.confirmPassword"
+                  [innerHTML]="formErrors.confirmPassword"
+                  class="form-val-hint">
+        </mat-error>
+        <div class="h-space"></div>
+
+        <button mat-raised-button color="accent" class="max-width" [disabled]="loading">Register</button>
+      </mat-card-content>
+    </mat-card>
+  </form>
+</div>

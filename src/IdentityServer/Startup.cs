@@ -1,45 +1,43 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
+using IdentityServer.Data;
+using IdentityServer.Models;
+using IdentityServer4.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Configuration;
-using IdentityServer4.Services;
-using IdentityServer.Models;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using IdentityServer.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Rewrite;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Tokens;
 
 namespace IdentityServer
 {
     public class Startup
     {
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
+        public IHostingEnvironment Environment { get; }
 
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration, IHostingEnvironment environment)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
-
-            builder.AddEnvironmentVariables();
-            Configuration = builder.Build();
+            Configuration = configuration;
+            Environment = environment;
         }
 
         public void ConfigureServices(IServiceCollection services)
         {
             // add db context
             services.AddDbContext<ApplicationDbContext>(options =>
+                //options.UseInMemoryDatabase(databaseName: "IdentityServer4"));
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
 
-            // configure identity password requirement
+            // add identity
+            services.AddIdentity<ApplicationUser, IdentityRole>()
+                .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddDefaultTokenProviders();
+
+            // configure password requirements
             services.Configure<IdentityOptions>(options =>
             {
                 options.Password.RequireDigit = false;
@@ -49,82 +47,74 @@ namespace IdentityServer
                 options.Password.RequireLowercase = false;
             });
 
-            // add identity
-            services.AddIdentity<ApplicationUser, IdentityRole>()
-                .AddEntityFrameworkStores<ApplicationDbContext>()
-                .AddDefaultTokenProviders();
-
-            // add cors
-            services.AddCors(options =>
-            {
-                options.AddPolicy("devCors",
-                    builder => builder.AllowAnyOrigin()
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials());
-
-                options.AddPolicy("prodCors",
-                    builder => builder.WithOrigins(
-                        "https://angular-d1.azurewebsites.net",
-                        "https://webapi-d1.azurewebsites.net")
-                    .AllowAnyMethod()
-                    .AllowAnyHeader()
-                    .AllowCredentials());
-            });
-
-            // add mvc
-            services.AddMvc();
+            // add mvc  
+            services.AddMvcCore()
+                .AddAuthorization()
+                .AddJsonFormatters();
 
             // dependency injection
             services.AddTransient<IProfileService, IdentityProfileService>();
 
             // add identityserver4
-            services.AddIdentityServer()
-                .AddTemporarySigningCredential()
+            var builder = services.AddIdentityServer()
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
-                .AddInMemoryApiResources(Config.GetApiResources())
+                .AddInMemoryApiResources(Config.GetApis())
                 .AddInMemoryClients(Config.GetClients())
+                //.AddTestUsers(Config.GetUsers())
                 .AddAspNetIdentity<ApplicationUser>()
                 .AddProfileService<IdentityProfileService>();
-        }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
-        {
-            loggerFactory.AddConsole();
 
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-                app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
+            services.AddAuthentication("Bearer")
+                .AddJwtBearer("Bearer", options =>
                 {
-                    Authority = "http://localhost:5000",
-                    RequireHttpsMetadata = false,
-                    ApiName = "accountApi"
+                    options.Authority = "http://localhost:5000";
+                    options.RequireHttpsMetadata = false;
+                    options.Audience = "accountApi";
+                    options.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ClockSkew = TimeSpan.FromMinutes(0)
+                    };
                 });
-                app.UseCors("devCors");
+
+            // add cors
+            services.AddCors(options =>
+            {
+                // this defines a CORS policy called "default"
+                options.AddPolicy("default", policy =>
+                {
+                    policy.WithOrigins("http://localhost:4200")
+                        .AllowAnyHeader()
+                        .AllowAnyMethod();
+                });
+            });
+
+            if (Environment.IsDevelopment())
+            {
+                builder.AddDeveloperSigningCredential();
             }
             else
             {
-                var options = new RewriteOptions().AddRedirectToHttps(302); // redirect to https
-                app.UseRewriter(options);
+                throw new Exception("need to configure key material");
+            }
+        }
 
-                app.UseIdentityServerAuthentication(new IdentityServerAuthenticationOptions
-                {
-                    Authority = "https://identityserver-d1.azurewebsites.net",
-                    RequireHttpsMetadata = false,
-                    ApiName = "accountApi"
-                });
-                app.UseCors("prodCors");
+        public void Configure(IApplicationBuilder app, ApplicationDbContext context)
+        {
+            if (Environment.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
             }
 
-            app.UseIdentity();
+            app.UseCors("default");
             app.UseIdentityServer();
+            app.UseAuthentication();
             app.UseMvc();
 
             // quick way to apply migration and test user
             try
             {
-                var context = app.ApplicationServices.GetService<ApplicationDbContext>();
+                //var context = app.ApplicationServices.GetService<ApplicationDbContext>();
 
                 // apply migration
                 context.Database.Migrate();

@@ -1,0 +1,12 @@
+.values-card {
+  width: 300px;
+}
+
+.value-card-content {
+  display: flex;
+  align-items: center;
+}
+
+.space-filler {
+  flex: 1 1 auto;
+}

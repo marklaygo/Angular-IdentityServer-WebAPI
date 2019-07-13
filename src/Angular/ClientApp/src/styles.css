@@ -1,0 +1,35 @@
+/* You can add global styles to this file, and also import other style files */
+@import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+* {
+  margin: 0px;
+}
+
+body {
+  background-color: #fafafa;
+  color: rgba(0,0,0,.87);
+}
+
+.max-width {
+  width: 100%;
+}
+
+.container {
+  margin: 3%;
+}
+
+.form-val-hint {
+  font-size: 75%;
+}
+
+.h-space {
+  margin-bottom: 10px;
+}
+
+.failed-color {
+  color: red;
+}
+
+.success-color {
+  color: green;
+}

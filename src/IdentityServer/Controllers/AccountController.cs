@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace IdentityServer.Controllers
 {
     [Route("api/[controller]")]
-    public class AccountController : Controller
+    public class AccountController : ControllerBase
     {
         #region Fields
 
@@ -49,7 +49,7 @@ namespace IdentityServer.Controllers
         }
 
         [HttpPost("ChangePassword")]
-        [Authorize]
+        [Authorize(AuthenticationSchemes = "Bearer")]
         public async Task<IActionResult> ChangePassword([FromBody]ChangePasswordViewModel model)
         {
             if (ModelState.IsValid)

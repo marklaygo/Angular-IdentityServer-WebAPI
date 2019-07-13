@@ -1,7 +1,0 @@
-﻿md-card-content div  {
-    margin-bottom: 10px;
-}
-
-md-card-content div:last-child {
-    margin-bottom: 0px;
-}

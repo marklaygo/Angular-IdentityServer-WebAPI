@@ -1,0 +1,7 @@
+mat-card-content div {
+  margin-bottom: 10px;
+}
+
+mat-card-content div:last-child {
+  margin-bottom: 0px;
+}
