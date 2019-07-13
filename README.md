@@ -20,13 +20,12 @@ a scenario where the client access an already existing api and an authentication
 ## Steps to run the project
 Note: First time you open the projet, it will install / download / restore all the dependencies (2 - 5mins) depending on your internet speed. <br />
 
-Note: You may experience binding error using node sass after you run the command `npm start`. Quick fix is to run the command `npm rebuild node-sass` <br />
-
 After Visual Studio installed all the dependencies 
-1. Run command `npm start` in Angular root directory (where the `package.json` is)
-2. In Visual Studio run the project `IdentityServer`
-3. In Visual Studio run the project `WebAPI`
-4. In your browser navigate to `localhost:8080`
+1. In Visual Studio run the project `IdentityServer`
+2. In Visual Studio run the project `WebAPI`
+3. Open cmd/powershell or any other command line interface and navigate to `Angular-IdentityServer-WebAPI/src/Angular/ClientApp` then type `npm install`.
+4. then type the command `ng serve` to run the angular app.
+5. Open your browser and navigate to `localhost:4200`
 
 ## What's included
 
